@@ -1,0 +1,38 @@
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
+
+<Files xmlrpc.php>
+deny from all
+RedirectMatch .* http://0.0.0.0/
+</Files>
+
+<FilesMatch "wp-login.php">
+AuthUserFile "..."
+AuthType Basic
+AuthName "Dostęp zabezpieczony"
+require valid-user
+</FilesMatch>
+
+ErrorDocument 400 /error-400.html
+ErrorDocument 401 /error.html
+ErrorDocument 403 /error.html
+ErrorDocument 404 /error-404.html
+ErrorDocument 500 /error-500.html
+ErrorDocument 503 /error.html
+
+# BEGIN php-denyhosts
+deny from 66.249.64.130
+deny from 66.249.64.135
+deny from 63.247.78.226
+deny from 198.204.235.26
+# END php-denyhosts
