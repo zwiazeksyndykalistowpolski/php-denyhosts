@@ -31,9 +31,9 @@ ErrorDocument 500 /error-500.html
 ErrorDocument 503 /error.html
 
 # BEGIN php-denyhosts
-deny from 66.249.64.130
-deny from 66.249.64.135
-deny from 63.247.78.226
-deny from 198.204.235.26
-deny from 4.5.6.7 # 2017-05-02 06:43:01, 3600
+deny from 1.2.3.4
+deny from 5.6.7.8
+deny from 1.4.1.6
+deny from 1.4.6.6
+deny from 4.5.6.7 # 2017-05-02 07:46:55, 3600
 # END php-denyhosts

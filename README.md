@@ -41,3 +41,17 @@ in every of your environment. Proposed length is 64 characters.
 Other thing - you can place this application in a directory with random prefix or suffix.
 Example: `denyhosts_9zbnKILG7e9HnVhW`. 
 So the bots would have it more difficult to find out that you are using this project.
+
+## Testing from shell
+
+To simulate logs parsing you can add an environment variable "PDH_SIMULATE" that would
+tell to not save anything, just print the logs.
+
+Example:
+```
+PDH_SIMULATE=true env=default php index.php
+```
+
+## TODO
+
+- unit tests

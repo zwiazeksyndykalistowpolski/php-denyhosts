@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
 namespace PhpDenyhosts\Services\Blocker;
+use League\Flysystem\FilesystemInterface;
+use Monolog\Logger;
 
 /**
  * Stores blocked IP addresses in the .htaccess file
@@ -18,15 +20,27 @@ class ApacheBlockerService implements BlockerService
     protected $storageFilePath;
 
     /**
+     * @var FilesystemInterface $filesystem
+     */
+    protected $filesystem;
+
+    /**
+     * @var Logger $logger
+     */
+    protected $logger;
+
+    /**
      * File divided into lines
      *
      * @var array $lines
      */
     protected $lines = [];
 
-    public function __construct(string $storageFilePath)
+    public function __construct(string $storageFilePath, FilesystemInterface $filesystem, Logger $logger)
     {
         $this->storageFilePath = $storageFilePath;
+        $this->filesystem      = $filesystem;
+        $this->logger          = $logger;
         $this->prepareFile();
     }
 
@@ -37,11 +51,8 @@ class ApacheBlockerService implements BlockerService
      */
     protected function prepareFile()
     {
-        if (!is_file($this->storageFilePath)) {
-            throw new \Exception('File "' . $this->storageFilePath . '" cannot be found, expected htaccess file, ');
-        }
-
-        $this->lines = file($this->storageFilePath);
+        $this->logger->info('Reading "' . $this->storageFilePath . '"');
+        $this->lines = explode("\n", $this->filesystem->read($this->storageFilePath));
 
         $tags = [
             $this->findMatch(self::TAG_BEGIN),
@@ -117,8 +128,6 @@ class ApacheBlockerService implements BlockerService
             $line .= ', ' . $time;
         }
 
-        $line .= "\n";
-
         if ($findEnd === false || $findEnd === 0) {
             throw new \Exception('Corrupted structure, not ending tag found, it should not happen');
         }
@@ -181,9 +190,11 @@ class ApacheBlockerService implements BlockerService
      */
     public function persist()
     {
-        $contents = implode("", $this->lines);
-        $pointer = fopen($this->storageFilePath, 'wb');
-        fwrite($pointer, $contents);
-        fclose($pointer);
+        if ($_SERVER['PDH_SIMULATE'] ?? null) {
+            return;
+        }
+
+        $contents = implode("\n", $this->lines);
+        $this->filesystem->update($this->storageFilePath, $contents);
     }
 }

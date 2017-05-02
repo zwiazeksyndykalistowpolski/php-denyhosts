@@ -3,6 +3,8 @@
 namespace PhpDenyhosts\Services;
 
 use Kassner\LogParser\FormatException;
+use League\Flysystem\FilesystemInterface;
+use Monolog\Logger;
 use PhpDenyhosts\LogParser;
 
 /**
@@ -21,20 +23,33 @@ class LogsParserService
     protected $pdo;
 
     /**
+     * @var FilesystemInterface $filesystem
+     */
+    protected $filesystem;
+
+    /**
      * @var string $accessLogPath
      */
     protected $accessLogPath;
 
-    public function __construct(string $accessLogPath, string $logFormat)
-    {
-        $this->parser = new LogParser($logFormat);
-        $this->pdo = new \PDO('sqlite::memory:');
-        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $this->accessLogPath = $accessLogPath;
+    /**
+     * @var Logger $logger
+     */
+    protected $logger;
 
-        if (!is_file($this->accessLogPath)) {
-            throw new \Exception('Cannot find access log under "' . $this->accessLogPath . '"');
-        }
+    public function __construct(
+        string $accessLogPath,
+        string $logFormat,
+        FilesystemInterface $filesystem,
+        Logger $logger
+    ) {
+        $this->parser = new LogParser($logFormat);
+        $this->pdo    = new \PDO('sqlite::memory:');
+        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        $this->accessLogPath = $accessLogPath;
+        $this->filesystem    = $filesystem;
+        $this->logger        = $logger;
 
         $this->prepareStructure();
     }
@@ -47,7 +62,18 @@ class LogsParserService
      */
     public function parseAccessLog()
     {
-        $lines = file($this->accessLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $this->logger->info('Reading "' . $this->accessLogPath . '"');
+        $raw = $this->filesystem->read($this->accessLogPath);
+
+        // handle gzipped files
+        if (substr(strtolower($this->accessLogPath), -3) === '.gz') {
+            $this->logger->info('Got a gzipped log file, uncompressing');
+            $raw = gzdecode($raw);
+        }
+
+        $lines = explode("\n", $raw);
+        $lines = array_filter($lines);
+        $this->logger->info('Got ' . count($lines) . ' lines to parse');
 
         foreach ($lines as $line) {
             try {
