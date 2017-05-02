@@ -12,6 +12,8 @@ is an easier way to create an elegant card, a personalized portfolio.
 The problem is that Wordpress is very often attacked by various bots, they are brute forcing different parts 
 like the administration panel, the login page, xmlrpc just to gain the access and infect and send their shitty spam.
 
+This project was created to ban unwanted traffic, so the server could be more responsive and more secure.
+
 Created originally by [Wolnościowiec team](https://github.com/Wolnosciowiec) for [Związek Syndykalistów Polski](http://zsp.net.pl) (Polish section of [International Workers Association](http://iwa-ait.org/) ).
 
 ## Installation
