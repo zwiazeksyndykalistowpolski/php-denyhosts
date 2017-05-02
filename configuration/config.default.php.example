@@ -2,21 +2,26 @@
 
 return [
 
-    // blacklist based filtering (AnalyzeBlacklistedPagesFloodAction)
-    'blacklist_enabled' => true,
-    'blacklist_timeInterval' => 300, // 5 minutes
-    'blacklist_retriesToBan' => 15,
-    'blacklist_banTime' => 3600,
-    'blacklist_paths' => [
+    // Blacklist based filtering (AnalyzeBlacklistedPagesFloodAction)
+    //   Look only for traffic on given URL addresses eg. /wp-login.php
+    //
+    'blacklist_enabled'      => true,
+    'blacklist_timeInterval' => 300,     // in this time amount of requests defined in blacklist_retriesToBan will result in a ban
+    'blacklist_retriesToBan' => 15,      // how much requests we need to send (in blacklist_timeInterval time) to be banned
+    'blacklist_banTime'      => 3600,    // how long the visitor should be blocked for (in seconds)
+    'blacklist_paths' => [               // urls to consider (includes a HTTP method in the beginning)
         '/(POST) \/wp-login/i',
         '/(POST|GET) \/xmlrpc/i',
     ],
 
-    // too many visited 403 pages
-    'forbiddenPages_enabled' => true,
-    'forbiddenPages_timeInterval' => 300,
-    'forbiddenPages_retriesToBan' => 10,
-    'forbiddenPages_banTime' => 3600,
+
+    // Filtering based on HTTP status code
+    //   Too many visited 403 pages
+    //
+    'forbiddenPages_enabled'      => true,  // is the method enabled or not?
+    'forbiddenPages_timeInterval' => 300,   // in this time amount of requests defined in forbiddenPages_retriesToBan will result in a ban
+    'forbiddenPages_retriesToBan' => 10,    // how much requests we need to send (in forbiddenPages_timeInterval time) to be banned
+    'forbiddenPages_banTime'      => 3600,  // how long the visitor should be blocked for (in seconds)
 
     'token' => '...',
     'storagePath' => __DIR__ . '/../example/structure/.htaccess',

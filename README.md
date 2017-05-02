@@ -29,6 +29,10 @@ composer require create-project zwiazeksyndykalistowpolski/phpdenyhosts phpdenyh
 In `configuration` directory there is a possibility to place multiple configuration files
 for every domain/project, please use the `config.default.php.example` as an example.
 
+See more:
+- [More documentation about the configuration](./configuration/README.md)
+- [Technical information about variables meaning, and a template of configuration](./configuration/config.default.php.example)
+
 ## Good practices
 
 To secure installation of PhpDenyhosts you may want to generate a strong token
