@@ -2,48 +2,51 @@
 
 namespace PhpDenyhosts;
 
+use Monolog\Logger;
+use PhpDenyhosts\Actions\AnalyzeAccessToForbiddenPagesAction;
+use PhpDenyhosts\Actions\AnalyzeBlacklistedPagesFloodAction;
 use PhpDenyhosts\Services\Blocker\ApacheBlockerService;
 use PhpDenyhosts\Services\LogsParserService;
+use PhpDenyhosts\Services\UnbanAction;
 
 class ActionController
 {
     protected $config = [];
 
-    /** @var LogsParserService $parser */
+    /**
+     * @var LogsParserService $parser
+     */
     protected $parser;
 
+    /**
+     * @var ApacheBlockerService $blocker
+     */
     protected $blocker;
 
-    public function __construct(array $configuration)
+    /**
+     * @var Logger $logger
+     */
+    protected $logger;
+
+    public function __construct(array $configuration, Logger $logger)
     {
-        $this->config = $configuration;
-        $this->parser = new LogsParserService($configuration['accessLogPath'] ?? '', $configuration['logFormat'] ?? '');
+        $this->config  = $configuration;
+        $this->parser  = new LogsParserService($configuration['accessLogPath'] ?? '', $configuration['logFormat'] ?? '');
         $this->blocker = new ApacheBlockerService($configuration['storagePath'] ?? '');
+        $this->logger  = $logger;
     }
 
     public function cleanUpAction()
     {
         $this->parser->parseAccessLog();
-        $this->analyzeSamePageFlood();
-    }
 
-    public function analyzeSamePageFlood()
-    {
-        foreach ($this->parser->findAll() as $entry) {
-            $flood = $this->parser->findAllWhere(
-                'host = :host AND request = :request AND stamp >= :stamp_begins AND stamp <= :stamp_ends',
-                [
-                    'host' => $entry['host'],
-                    'request' => $entry['request'],
-                    'stamp_begins' => ($entry['stamp']) - $this->getTimeInterval(),
-                    'stamp_ends'  => ($entry['stamp']),
-                ]
-            );
-        }
-    }
+        (new AnalyzeBlacklistedPagesFloodAction($this->blocker, $this->parser, $this->config, $this->logger))
+            ->execute();
 
-    private function getTimeInterval()
-    {
-        return $this->config['timeInterval'] ?? 300;
+        (new AnalyzeAccessToForbiddenPagesAction($this->blocker, $this->parser, $this->config, $this->logger))
+            ->execute();
+
+        (new UnbanAction($this->parser, $this->blocker, $this->config, $this->logger))
+            ->execute();
     }
 }

@@ -67,7 +67,7 @@ class LogsParserService
      *     - int stamp
      *     - datetime time
      *     - string request
-     *     - string status
+     *     - int status
      *     - string login
      *
      * @param string $queryString

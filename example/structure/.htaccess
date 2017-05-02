@@ -35,4 +35,5 @@ deny from 66.249.64.130
 deny from 66.249.64.135
 deny from 63.247.78.226
 deny from 198.204.235.26
+deny from 4.5.6.7 # 2017-05-02 06:43:01, 3600
 # END php-denyhosts

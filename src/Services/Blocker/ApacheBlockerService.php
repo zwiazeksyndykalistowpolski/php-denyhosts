@@ -92,24 +92,88 @@ class ApacheBlockerService implements BlockerService
     }
 
     /**
+     * @param string $ip
+     * @return bool
+     */
+    public function isBlockedAlready(string $ip): bool
+    {
+        return $this->findMatch('deny from ' . $ip, true) !== false;
+    }
+
+    /**
      * Block a single IP address
      *
      * @param string $ip
+     * @param int $time How long the address would be banned?
+     *
      * @throws \Exception
      */
-    public function blockAddress(string $ip)
+    public function blockAddress(string $ip, int $time = 0)
     {
         $findEnd = $this->findMatch(self::TAG_END);
         $line = 'deny from ' . $ip . ' # ' . date('Y-m-d H:i:s');
+
+        if ($time > 0) {
+            $line .= ', ' . $time;
+        }
+
+        $line .= "\n";
 
         if ($findEnd === false || $findEnd === 0) {
             throw new \Exception('Corrupted structure, not ending tag found, it should not happen');
         }
 
         // add an IP address only in case it is not a duplicate
-        if ($this->findMatch($line, true) !== false) {
-            array_splice($this->lines, ($findEnd - 1), 0, $line);
+        if ($this->findMatch($line, true) === false) {
+            array_splice($this->lines, $findEnd, 0, $line);
         }
+    }
+
+    /**
+     * Unblock a IP address
+     *
+     * @param string $ip
+     */
+    public function unblockAddress(string $ip)
+    {
+        $position = $this->findMatch('deny from ' . $ip, true);
+
+        if ($position !== false) {
+            array_splice($this->lines, $position, 1);
+        }
+    }
+
+    /**
+     * Find all blocked entries that already expired
+     *
+     * @return array
+     */
+    public function findAllExpired(): array
+    {
+        $expired = [];
+
+        foreach ($this->lines as $line) {
+            if (substr(strtolower($line), 0, 10) !== 'deny from ') {
+                continue;
+            }
+
+            // format:
+            // deny from 1.2.3.4 # 2015-05-05, 60
+            $parts = explode('#', $line);
+            $commentParts = explode(', ', $parts[1] ?? '');
+            $dateTime = strtotime($commentParts[0]);
+            $expirationTime = (int) ($commentParts[1] ?? 0);
+
+            if ($expirationTime === 0 || $dateTime === false) {
+                continue;
+            }
+
+            if (time() >= ($dateTime + $expirationTime)) {
+                $expired[] = trim(str_replace('deny from ', '', strtolower($parts[0])));
+            }
+        }
+
+        return $expired;
     }
 
     /**
@@ -117,7 +181,7 @@ class ApacheBlockerService implements BlockerService
      */
     public function persist()
     {
-        $contents = implode("\n", $this->lines);
+        $contents = implode("", $this->lines);
         $pointer = fopen($this->storageFilePath, 'wb');
         fwrite($pointer, $contents);
         fclose($pointer);
