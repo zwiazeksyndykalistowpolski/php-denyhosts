@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+        bootstrap                   = "./src/Bootstrap/bootstrap.php"
+        backupGlobals               = "false"
+        backupStaticAttributes      = "false"
+        convertErrorsToExceptions   = "true"
+        convertNoticesToExceptions  = "true"
+        convertWarningsToExceptions = "true"
+        processIsolation            = "false"
+        stopOnFailure               = "false"
+        syntaxCheck                 = "false"
+        colors                      = "true">
+
+    <php>
+        <const name="IN_UNIT_TEST" value="true"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Test suite">
+            <directory suffix="Test.php">./tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>./</directory>
+            <exclude>
+                <directory>./configuration</directory>
+                <directory>./docs</directory>
+                <directory>./example</directory>
+                <directory>./vendor</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>
