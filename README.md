@@ -21,6 +21,7 @@ Created originally by [Wolnościowiec team](https://github.com/Wolnosciowiec) fo
 ```
 # via git
 git clone https://github.com/zwiazeksyndykalistowpolski/php-denyhosts.git
+composer install
 
 # via composer
 composer require create-project zwiazeksyndykalistowpolski/phpdenyhosts phpdenyhosts
