@@ -122,11 +122,15 @@ class ApacheBlockerService implements BlockerService
     public function blockAddress(string $ip, int $time = 0)
     {
         $findEnd = $this->findMatch(self::TAG_END);
-        $line = 'deny from ' . $ip . ' # ' . date('Y-m-d H:i:s');
+        $line = 'deny from ' . $ip . ' # ';
+
+        $metadata = date('Y-m-d H:i:s');
 
         if ($time > 0) {
-            $line .= ', ' . $time;
+            $metadata .= ', ' . $time;
         }
+
+        $line .= base64_encode($metadata);
 
         if ($findEnd === false || $findEnd === 0) {
             throw new \Exception('Corrupted structure, not ending tag found, it should not happen');
@@ -166,10 +170,10 @@ class ApacheBlockerService implements BlockerService
                 continue;
             }
 
-            // format:
+            // format (decoded):
             // deny from 1.2.3.4 # 2015-05-05, 60
             $parts = explode('#', $line);
-            $commentParts = explode(', ', $parts[1] ?? '');
+            $commentParts = explode(', ', base64_decode($parts[1]) ?? '');
             $dateTime = strtotime($commentParts[0]);
             $expirationTime = (int) ($commentParts[1] ?? 0);
 
