@@ -1,6 +1,8 @@
 PhpDenyhosts
 ============
 
+[![Build Status](https://travis-ci.org/zwiazeksyndykalistowpolski/php-denyhosts.svg?branch=master)](https://travis-ci.org/zwiazeksyndykalistowpolski/php-denyhosts)
+
 Inspired by the _denyhosts_ and _fail2ban_ projects created **to secure cheap shared hostings** where is no
 access to the shell, but there is still an **access.log** and **Apache htaccess** accessible from PHP side.
 
