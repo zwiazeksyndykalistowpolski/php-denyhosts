@@ -8,7 +8,7 @@ $envName = strtolower($envName);
 $envName = preg_replace("/[^a-zA-Z0-9\\.\\-\\_]+/", "", $envName);
 define('ENV_NAME', $envName);
 
-if (!defined('IN_UNIT_TEST') && !is_file(__DIR__ . '/configuration/config.' . $envName . '.php')) {
+if (!defined('IN_UNIT_TEST') && !is_file(__DIR__ . '/../configuration/config.' . $envName . '.php')) {
     print(json_encode([
         'error' => 'Invalid env parameter value',
     ], JSON_PRETTY_PRINT));
