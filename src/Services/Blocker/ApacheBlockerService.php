@@ -173,7 +173,9 @@ class ApacheBlockerService implements BlockerService
             // format (decoded):
             // deny from 1.2.3.4 # 2015-05-05, 60
             $parts = explode('#', $line);
-            $commentParts = explode(', ', base64_decode($parts[1]) ?? '');
+            $afterHash = $parts[1] ?? '';
+
+            $commentParts = explode(', ', $afterHash ? base64_decode($afterHash) : '');
             $dateTime = strtotime($commentParts[0]);
             $expirationTime = (int) ($commentParts[1] ?? 0);
 
