@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpDenyhosts\Services;
+namespace PhpDenyhosts\Actions;
 
 use Monolog\Logger;
-use PhpDenyhosts\Actions\CleanUpAction;
 use PhpDenyhosts\Services\Blocker\BlockerService;
+use PhpDenyhosts\Services\LogsParserService;
 
 class UnbanAction implements CleanUpAction
 {

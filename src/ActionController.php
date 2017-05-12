@@ -8,9 +8,9 @@ use League\Flysystem\FilesystemInterface;
 use Monolog\Logger;
 use PhpDenyhosts\Actions\AnalyzeAccessToForbiddenPagesAction;
 use PhpDenyhosts\Actions\AnalyzeBlacklistedPagesFloodAction;
+use PhpDenyhosts\Actions\UnbanAction;
 use PhpDenyhosts\Services\Blocker\ApacheBlockerService;
 use PhpDenyhosts\Services\LogsParserService;
-use PhpDenyhosts\Services\UnbanAction;
 
 class ActionController
 {
