@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+set_time_limit(500);
+
 // environment name (configuration file that will be used)
 $envName = ($_SERVER['env'] ?? null) ?? ($_GET['env'] ?? 'default');
 $envName = strtolower($envName);
